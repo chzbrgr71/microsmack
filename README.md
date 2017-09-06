@@ -6,6 +6,7 @@ This is a simple set of Go apps to demonstrate web and microservices API communi
 
 * Web UI
   - Calls web API using ENVVAR
+  - Listens on port 8080
   
 * Web API
-  - Listens on port 8080
+  - Listens on port 8081
