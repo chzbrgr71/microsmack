@@ -1,11 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/test", testHandler)
-	http.ListenAndServe(":8080", nil)
+	router := NewRouter()
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
