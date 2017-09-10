@@ -8,6 +8,11 @@ This is a simple set of Go apps to demonstrate web and microservices API communi
   - Calls web API using ENVVAR
   - Listens on port 8080  
   
+#### Container Details
+[![](https://images.microbadger.com/badges/image/chzbrgr71/smackweb.svg)](https://microbadger.com/images/chzbrgr71/smackweb "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/chzbrgr71/smackweb.svg)](https://microbadger.com/images/chzbrgr71/smackweb "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/chzbrgr71/smackweb.svg)](https://microbadger.com/images/chzbrgr71/smackweb "Get your own commit badge on microbadger.com")
+
 ### Web API
   - Listens on port 8081
 
