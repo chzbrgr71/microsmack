@@ -10,7 +10,10 @@ import (
 
 func getBackColor() string {
 	// call api for background color
-	url := "http://localhost:8081/all"
+	var apiService = os.Getenv("API_SERVICE")
+	var apiPort = os.Getenv("API_PORT")
+	url := "http://" + apiService + ":" + apiPort + "/all"
+
 	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
