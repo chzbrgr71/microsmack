@@ -15,14 +15,15 @@ type Config struct {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	// gather values
 	var backColor = getBackColor()
-	var hostname = getHostname()
-	var appversion = "1.0.0"
 	var gitSHA = os.Getenv("GIT_SHA")
 	var appVersion = os.Getenv("APP_VERSION")
 	var imageBuildDate = os.Getenv("IMAGE_BUILD_DATE")
+	var kubeNodeName = os.Getenv("KUBE_NODE_NAME")
+	var kubePodName = os.Getenv("KUBE_POD_NAME")
+	var kubePodIP = os.Getenv("KUBE_POD_IP")
 
 	// render page
-	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Homepage</h1><body style=background-color:%s><p>Version: %s</p><p>Hostname: %s</p><p>Git: %s</p><p>App version: %s</p><p>Image build date: %s</p></body></html>", backColor, appversion, hostname, gitSHA, appVersion, imageBuildDate)
+	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Homepage</h1><body style=background-color:%s><p>Git: %s</p><p>App version: %s</p><p>Image build date: %s</p><p>Kubernetes node: %s</p><p>Kubernetes pod name: %s</p><p>Kubernetes pod IP: %s</p></body></html>", backColor, gitSHA, appVersion, imageBuildDate, kubeNodeName, kubePodName, kubePodIP)
 	fmt.Fprintf(w, html)
 }
 
