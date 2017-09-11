@@ -52,4 +52,10 @@ var routes = Routes{
 		"/article/{key}/{var1}/{var2}/",
 		returnSingleConfig,
 	},
+	Route{
+		"test",
+		"GET",
+		"/test",
+		testHandler,
+	},
 }

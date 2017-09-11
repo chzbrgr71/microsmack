@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -41,4 +42,18 @@ func returnSingleConfig(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Var 1: " + var1)
 	fmt.Println("Var 2: " + var2)
 	fmt.Fprintf(w, "Key: "+key)
+}
+
+func testHandler(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Add("Content-Type", "text/html")
+	resp.WriteHeader(http.StatusOK)
+	fmt.Fprint(resp, "RUNNING")
+}
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	// A very simple health check
+	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusBadGateway)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, `{"alive": true}`)
 }

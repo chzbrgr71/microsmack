@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -31,4 +32,12 @@ func testHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Add("Content-Type", "text/html")
 	resp.WriteHeader(http.StatusOK)
 	fmt.Fprint(resp, "RUNNING")
+}
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	// A very simple health check
+	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusBadGateway)
+	w.Header().Set("Content-Type", "application/json")
+	io.WriteString(w, `{"alive": true}`)
 }
