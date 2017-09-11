@@ -8,9 +8,9 @@ This is a simple set of Go apps to demonstrate web and microservices API communi
   - Calls web API using ENVVAR
   - Listens on port 8080  
 
-  ```
-  docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg VERSION=$VERSION -t chzbrgr71/smackapi .
-  ```
+  ```docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg VERSION=$VERSION -t chzbrgr71/smackapi .```
+
+  ```helm install --name=smackapi ./charts/smackapi```
   
 #### Container Details
 [![](https://images.microbadger.com/badges/image/chzbrgr71/smackweb.svg)](https://microbadger.com/images/chzbrgr71/smackweb "Get your own image badge on microbadger.com")
@@ -20,9 +20,9 @@ This is a simple set of Go apps to demonstrate web and microservices API communi
 ### Web API
   - Listens on port 8081
 
-  ```
-  docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg VERSION=$VERSION -t chzbrgr71/smackweb .
-  ```
+  ```docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg VERSION=$VERSION -t chzbrgr71/smackweb .```
+  
+  ```helm install --name=smackweb ./charts/smackweb```
 
 #### Container Details
 [![](https://images.microbadger.com/badges/image/chzbrgr71/smackapi.svg)](https://microbadger.com/images/chzbrgr71/smackapi "Get your own image badge on microbadger.com")
