@@ -10,6 +10,7 @@ import (
 )
 
 type Config struct {
+	Key      string `json:"Key"`
 	Category string `json:"Category"`
 	Item     string `json:"Item"`
 	Value    string `json:"Value"`
@@ -22,7 +23,23 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func returnAllConfigs(w http.ResponseWriter, r *http.Request) {
-	configs := Config{Category: "UI", Item: "Background Color", Value: "Blue"}
+	configs := Configs{
+		Config{Key: "1", Category: "UI", Item: "Background Color", Value: "Blue"},
+		Config{Key: "2", Category: "k8s", Item: "Kubernetes Node", Value: "minkube"},
+		Config{Key: "3", Category: "k8s", Item: "Kubernetes Pod", Value: "pod-name"},
+		Config{Key: "4", Category: "k8s", Item: "Kubernetes IP", Value: "192.168.1.1"},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(configs); err != nil {
+		panic(err)
+	}
+}
+
+func returnColor(w http.ResponseWriter, r *http.Request) {
+	configs := Config{Key: "1", Category: "UI", Item: "Background Color", Value: "Blue"}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -33,14 +50,10 @@ func returnAllConfigs(w http.ResponseWriter, r *http.Request) {
 }
 
 func returnSingleConfig(w http.ResponseWriter, r *http.Request) {
-	// need to implement this...
+	// need to implement this... return single item based on key
 	vars := mux.Vars(r)
 	key := vars["key"]
-	var1 := vars["var1"]
-	var2 := vars["var2"]
 
-	fmt.Println("Var 1: " + var1)
-	fmt.Println("Var 2: " + var2)
 	fmt.Fprintf(w, "Key: "+key)
 }
 
@@ -51,7 +64,7 @@ func testHandler(resp http.ResponseWriter, req *http.Request) {
 }
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	// A very simple health check
+	// A very simple health check. can simulate error with http status
 	w.WriteHeader(http.StatusOK)
 	//w.WriteHeader(http.StatusBadGateway)
 	w.Header().Set("Content-Type", "application/json")

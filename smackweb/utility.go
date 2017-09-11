@@ -11,8 +11,14 @@ import (
 func getBackColor() string {
 	// call api for background color
 	var apiService = os.Getenv("API_SERVICE")
+	if len(apiService) == 0 {
+		apiService = "localhost"
+	}
 	var apiPort = os.Getenv("API_PORT")
-	url := "http://" + apiService + ":" + apiPort + "/all"
+	if len(apiPort) == 0 {
+		apiPort = "8081"
+	}
+	url := "http://" + apiService + ":" + apiPort + "/getcolor"
 
 	response, err := http.Get(url)
 	if err != nil {
@@ -29,8 +35,7 @@ func getBackColor() string {
 
 	var configObject Config
 	json.Unmarshal(responseData, &configObject)
-	//category := configObject.Category
-	//item := configObject.Item
+
 	value := configObject.Value
 
 	return value

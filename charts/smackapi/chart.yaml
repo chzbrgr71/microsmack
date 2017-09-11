@@ -1,4 +1,4 @@
-name: smackweb
+name: smackapi
 home: https://github.com/chzbrgr71/microsmack
 version: 1.0
 description: Simple web app for demonstrating Kubernetes

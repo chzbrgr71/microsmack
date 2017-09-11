@@ -47,9 +47,15 @@ var routes = Routes{
 		returnAllConfigs,
 	},
 	Route{
+		"ReturnColor",
+		"GET",
+		"/getcolor",
+		returnColor,
+	},
+	Route{
 		"ReturnSingle",
 		"GET",
-		"/article/{key}/{var1}/{var2}/",
+		"/article/{key}/",
 		returnSingleConfig,
 	},
 	Route{

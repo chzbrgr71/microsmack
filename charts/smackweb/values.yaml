@@ -8,5 +8,5 @@ replicas: 4
 image: "chzbrgr71/smackweb"
 imageTag: "latest"
 imagePullPolicy: "Always"
-apiService: "smackapi.default.svc.cluster.local"
+apiService: "smackapi-svc.default.svc.cluster.local"
 apiPort: 8081
