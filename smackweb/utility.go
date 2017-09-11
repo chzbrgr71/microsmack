@@ -22,7 +22,8 @@ func getBackColor() string {
 
 	response, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		// if we get an error, default page to a set color
+		return "powderblue"
 	}
 
 	defer response.Body.Close()
