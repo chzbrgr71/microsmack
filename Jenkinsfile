@@ -26,7 +26,7 @@ volumes:[
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
             def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
-            def buildDate = new Date()
+            def buildDate = new Date().format​('yyyyMMddHH:mm:ss')
             println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
             println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
