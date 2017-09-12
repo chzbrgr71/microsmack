@@ -3,7 +3,8 @@ import groovy.json.JsonOutput
 
 podTemplate(label: 'jenkins-pipeline', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave:2.62', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins', resourceRequestCpu: '200m', resourceLimitCpu: '200m', resourceRequestMemory: '256Mi', resourceLimitMemory: '256Mi'),
-    containerTemplate(name: 'golang', image: 'golang:1.7.5', command: 'cat', ttyEnabled: true)
+    containerTemplate(name: 'golang', image: 'golang:1.7.5', command: 'cat', ttyEnabled: true),
+    containerTemplate(name: 'docker', image: 'docker:17.06.0', command: 'cat', ttyEnabled: true)
 ],
 volumes:[
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -11,11 +12,10 @@ volumes:[
     {
         node ('jenkins-pipeline') {
             println "DEBUG: Pipeline starting"
-
             def pwd = pwd()
             checkout scm
 
-            // prep config for pipeline
+            // prep config values for pipeline
             sh 'git rev-parse HEAD > git_commit_id.txt'
             try {
                 env.GIT_COMMIT_ID = readFile('git_commit_id.txt').trim()
@@ -34,7 +34,6 @@ volumes:[
             println "DEBUG: imageTag ==> " + imageTag
 
             println "DEBUG: Start code compile stage"
-
             stage ('BUILD: code compile and test') {
                 container('golang') {
                     sh "go get github.com/gorilla/mux"
@@ -45,6 +44,16 @@ volumes:[
                 }
             }
 
+            stage ('BUILD: containerize and publish TO ACR') {
+                container('docker') {
+                    // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
+                    sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
+                    sh "docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
+                    sh "docker push chzbrgr71/smackapi:${imageTag}"
+                    sh "docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
+                    sh "docker push chzbrgr71/smackweb:${imageTag}"
+                }
+            }
         }
     }
 
