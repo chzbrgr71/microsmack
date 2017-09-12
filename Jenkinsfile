@@ -48,9 +48,9 @@ volumes:[
                 container('docker') {
                     // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
                     sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE=`date` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
                     sh "docker push chzbrgr71/smackapi:${imageTag}"
-                    sh "docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE=`date` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
                     sh "docker push chzbrgr71/smackweb:${imageTag}"
                 }
             }
