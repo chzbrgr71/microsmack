@@ -16,18 +16,29 @@ volumes:[
             checkout scm
 
             // prep config for pipeline
-            gitEnvVars()
-            def image_tags_map = getContainerTags()
-            def image_tags_list = getMapValues(image_tags_map)
+            sh 'git rev-parse HEAD > git_commit_id.txt'
+            try {
+                env.GIT_COMMIT_ID = readFile('git_commit_id.txt').trim()
+                env.GIT_SHA = env.GIT_COMMIT_ID.substring(0, 7)
+            } catch (e) {
+                error "${e}"
+            }
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
+            def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
+            println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
+            println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
+            println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
+            println "DEBUG: env.JOB_NAME ==> ${env.JOB_NAME}"
+            println "DEBUG: env.BUILD_NUMBER ==> ${env.BUILD_NUMBER}"
+            println "DEBUG: imageTag ==> " + imageTag
 
             println "DEBUG: Start code compile stage"
 
             stage ('BUILD: code compile and test') {
                 container('golang') {
-                    sh "cd smackapi && go get github.com/gorilla/mux"
-                    sh "go build"
+                    sh "go get github.com/gorilla/mux"
+                    sh "cd smackapi && go build"
                     sh "go test -v"
                     sh "cd ../smackweb && go build"
                     sh "go test -v"
@@ -39,8 +50,6 @@ volumes:[
 
 // --------------
 // Utility functions. These would normally be in an external library in a seperate repo
-
-// kubernetes functions
 
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
@@ -112,26 +121,6 @@ def helmTest(Map args) {
 
     sh "helm test ${args.name} --cleanup"
 }
-
-// utilities
-
-def gitEnvVars() {
-    // create git envvars
-    println "Setting envvars to tag container"
-
-    sh 'git rev-parse HEAD > git_commit_id.txt'
-
-    try {
-        env.GIT_COMMIT_ID = readFile('git_commit_id.txt').trim()
-        env.GIT_SHA = env.GIT_COMMIT_ID.substring(0, 7)
-    } catch (e) {
-        error "${e}"
-    }
-    println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
-    println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
-
-}
-
 
 def containerBuildPub(Map args) {
 
