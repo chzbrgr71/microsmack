@@ -17,7 +17,6 @@ volumes:[
 
             // prep config for pipeline
             gitEnvVars()
-            def acct = getContainerRepoAcct(config)
             def image_tags_map = getContainerTags(config)
             def image_tags_list = getMapValues(image_tags_map)
             def buildName = env.JOB_NAME
