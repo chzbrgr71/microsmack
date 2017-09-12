@@ -128,14 +128,8 @@ def gitEnvVars() {
         error "${e}"
     }
     println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
+    println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
 
-    sh 'git config --get remote.origin.url> git_remote_origin_url.txt'
-    try {
-        env.GIT_REMOTE_URL = readFile('git_remote_origin_url.txt').trim()
-    } catch (e) {
-        error "${e}"
-    }
-    println "env.GIT_REMOTE_URL ==> ${env.GIT_REMOTE_URL}"
 }
 
 
@@ -159,7 +153,7 @@ def containerBuildPub(Map args) {
 
 def getContainerTags(config, Map tags = [:]) {
 
-    println "getting list of tags for container"
+    println "DEBUG: getting list of tags for container"
     def String commit_tag
     def String version_tag
 
