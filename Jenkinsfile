@@ -17,7 +17,7 @@ volumes:[
 
             // prep config for pipeline
             gitEnvVars()
-            def image_tags_map = getContainerTags(config)
+            def image_tags_map = getContainerTags()
             def image_tags_list = getMapValues(image_tags_map)
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
@@ -151,7 +151,7 @@ def containerBuildPub(Map args) {
         }
     }
 
-def getContainerTags(config, Map tags = [:]) {
+def getContainerTags() {
 
     println "DEBUG: getting list of tags for container"
     def String commit_tag
