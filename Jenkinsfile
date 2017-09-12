@@ -26,12 +26,14 @@ volumes:[
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
             def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
+            def buildDate = new Date()
             println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
             println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
             println "DEBUG: env.JOB_NAME ==> ${env.JOB_NAME}"
             println "DEBUG: env.BUILD_NUMBER ==> ${env.BUILD_NUMBER}"
             println "DEBUG: imageTag ==> " + imageTag
+            println "DEBUG: buildDate ==> " + buildDate
 
             println "DEBUG: Start code compile stage"
             stage ('BUILD: code compile and test') {
@@ -48,9 +50,9 @@ volumes:[
                 container('docker') {
                     // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
                     sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "docker build --build-arg BUILD_DATE=`date` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE=${buildDate} --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
                     sh "docker push chzbrgr71/smackapi:${imageTag}"
-                    sh "docker build --build-arg BUILD_DATE=`date` --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE=${buildDate} --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
                     sh "docker push chzbrgr71/smackweb:${imageTag}"
                 }
             }
