@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-import groovy.json.JsonOutput
+import java.text.SimpleDateFormat
 
 podTemplate(label: 'jenkins-pipeline', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave:2.62', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins', resourceRequestCpu: '200m', resourceLimitCpu: '200m', resourceRequestMemory: '256Mi', resourceLimitMemory: '256Mi'),
@@ -26,7 +26,9 @@ volumes:[
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
             def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
-            def buildDate = new Date().format​('yyyyMMddHH:mm:ss')
+            def date = new Date()
+            sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+            def buildDate = sdf.format(date)
             println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
             println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
@@ -50,9 +52,9 @@ volumes:[
                 container('docker') {
                     // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
                     sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "docker build --build-arg BUILD_DATE=${buildDate} --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} -f ./smackapi/Dockerfile ."
                     sh "docker push chzbrgr71/smackapi:${imageTag}"
-                    sh "docker build --build-arg BUILD_DATE=${buildDate} --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
+                    sh "docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
                     sh "docker push chzbrgr71/smackweb:${imageTag}"
                 }
             }
