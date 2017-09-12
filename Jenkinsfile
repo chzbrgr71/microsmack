@@ -58,8 +58,6 @@ def kubectlTest() {
 
 }
 
-// helm functions
-
 def helmLint(String chart_dir) {
     // lint helm chart
     println "running helm lint ${chart_dir}"
@@ -139,59 +137,6 @@ def containerBuildPub(Map args) {
         return img.id
         }
     }
-
-def getContainerTags(Map tags = [:]) {
-
-    println "DEBUG: getting list of tags for container"
-    println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
-
-    def String commit_tag
-    def String version_tag
-
-    try {
-        // if PR branch tag with only branch name
-        if (env.BRANCH_NAME.contains('PR')) {
-            commit_tag = env.BRANCH_NAME
-            tags << ['commit': commit_tag]
-            return tags
-        }
-    } catch (Exception e) {
-        println "WARNING: commit unavailable from env. ${e}"
-    }
-
-    // commit tag
-    try {
-        // if branch available, use as prefix, otherwise only commit hash
-        if (env.BRANCH_NAME) {
-            commit_tag = env.BRANCH_NAME + '-' + env.GIT_COMMIT_ID.substring(0, 7)
-        } else {
-            commit_tag = env.GIT_COMMIT_ID.substring(0, 7)
-        }
-        tags << ['commit': commit_tag]
-    } catch (Exception e) {
-        println "WARNING: commit unavailable from env. ${e}"
-    }
-
-    // master tag
-    try {
-        if (env.BRANCH_NAME == 'master') {
-            tags << ['master': 'latest']
-        }
-    } catch (Exception e) {
-        println "WARNING: branch unavailable from env. ${e}"
-    }
-
-    // build tag only if none of the above are available
-    if (!tags) {
-        try {
-            tags << ['build': env.BUILD_TAG]
-        } catch (Exception e) {
-            println "WARNING: build tag unavailable from config.project. ${e}"
-        }
-    }
-
-    return tags
-}
 
 def getContainerRepoAcct(config) {
 
