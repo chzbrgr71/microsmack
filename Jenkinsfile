@@ -39,9 +39,9 @@ volumes:[
                 container('golang') {
                     sh "go get github.com/gorilla/mux"
                     sh "cd smackapi && go build"
-                    sh "go test -v"
-                    sh "cd ../smackweb && go build"
-                    sh "go test -v"
+                    sh "cd smackapi && go test -v"
+                    sh "cd smackweb && go build"
+                    sh "cd smackweb && go test -v"
                 }
             }
 
