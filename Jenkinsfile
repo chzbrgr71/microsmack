@@ -154,6 +154,8 @@ def containerBuildPub(Map args) {
 def getContainerTags() {
 
     println "DEBUG: getting list of tags for container"
+    println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
+    
     def String commit_tag
     def String version_tag
 
