@@ -80,11 +80,11 @@ volumes:[
                     // push images to repo (ACR)
                     def apiACRImage = acrServer + "/" + apiImage
                     sh "docker tag ${apiImage} ${apiACRImage}"
-                    sh "docker push ${apiImage}"
+                    sh "docker push ${apiACRImage}"
                     println "DEBUG: pushed image ${apiACRImage}"
                     def webACRImage = acrServer + "/" + webImage
                     sh "docker tag ${webImage} ${webACRImage}"
-                    sh "docker push ${webImage}"
+                    sh "docker push ${webACRImage}"
                     println "DEBUG: pushed image ${webACRImage}"
                 }
             }
