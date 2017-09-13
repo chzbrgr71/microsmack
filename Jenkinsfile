@@ -12,10 +12,16 @@ volumes:[
     {
         node ('jenkins-pipeline') {
             println "DEBUG: Pipeline starting"
-            def pwd = pwd()
+        
+            // grab repo from source control
             checkout scm
 
-            // prep config values for pipeline
+            // configuration parameters and variables for pipeline
+            // def pwd = pwd()
+            def repo = "chzbrgr71"
+            def appMajorVersion = "1.0"
+            def acrServer = "briar123.azurecr.io"
+            def acrJenkinsCreds = "acr_creds" //this is set in Jenkins global credentials
             sh 'git rev-parse HEAD > git_commit_id.txt'
             try {
                 env.GIT_COMMIT_ID = readFile('git_commit_id.txt').trim()
@@ -23,8 +29,6 @@ volumes:[
             } catch (e) {
                 error "${e}"
             }
-            def repo = "chzbrgr71"
-            def appMajorVersion = "1.0"
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
             def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
@@ -35,6 +39,7 @@ volumes:[
             def apiImage = "${repo}/smackapi:${imageTag}"
             def webImage = "${repo}/smackweb:${imageTag}"
 
+            // write out variables for debug purposes
             println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
             println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
@@ -46,7 +51,7 @@ volumes:[
             println "DEBUG: apiImage ==> " + apiImage
             println "DEBUG: webImage ==> " + webImage
 
-            println "DEBUG: Start code compile stage"
+            println "DEBUG: code compile and test stage starting"
             stage ('BUILD: code compile and test') {
                 container('golang') {
                     sh "go get github.com/gorilla/mux"
@@ -58,18 +63,36 @@ volumes:[
             }
 
             stage ('BUILD: containerize and publish TO repository') {
+                println "DEBUG: build and push containers stage starting"
                 container('docker') {
-                    // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
-                    sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t ${apiImage} ."
-                    sh "docker push ${apiImage}"
-                    println "DEBUG: pushed image ${apiImage}"
+                    // Login to ACR
+                    withCredentials([[$class          : 'UsernamePasswordMultiBinding', credentialsId: acrJenkinsCreds,
+                                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                        println "DEBUG: docker login ${acrServer} -u ${env.USERNAME} -p ${env.PASSWORD}"
+                        sh "docker login ${acrServer} -u ${env.USERNAME} -p ${env.PASSWORD}"
+                        // optionally push to Docker Hub with a custom Jenkins env variable
+                    }
+
+                    // build containers
+                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t ${apiImage} ."                    
                     sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t ${webImage} ."
+
+                    // push images to repo (ACR)
+                    def apiACRImage = acrServer + "/" + apiImage
+                    sh "docker tag ${apiImage} ${apiACRImage}"
+                    sh "docker push ${apiImage}"
+                    println "DEBUG: pushed image ${apiACRImage}"
+                    def webACRImage = acrServer + "/" + webImage
+                    sh "docker tag ${webImage} ${webACRImage}"
                     sh "docker push ${webImage}"
-                    println "DEBUG: pushed image ${webImage}"
+                    println "DEBUG: pushed image ${webACRImage}"
                 }
             }
+
             // use kubernetes plug-in to release or update app
+            stage ('DEPLOY: update application on kubernetes') {
+                println "DEBUG: deploy new containers to kubernetes stage"
+            }
         }
     }
 
