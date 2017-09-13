@@ -23,19 +23,27 @@ volumes:[
             } catch (e) {
                 error "${e}"
             }
+            def repo = "chzbrgr71"
+            def appMajorVersion = "1.0"
             def buildName = env.JOB_NAME
             def buildNumber = env.BUILD_NUMBER
             def imageTag = env.BRANCH_NAME + '-' + env.GIT_SHA
             def date = new Date()
             sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
             def buildDate = sdf.format(date)
+            def appVersion = "${appMajorVersion}.${env.BUILD_NUMBER}"
+            def apiImage = "${repo}/smackapi:${imageTag}"
+            def webImage = "${repo}/smackweb:${imageTag}"
+
             println "DEBUG: env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
             println "DEBUG: env.GIT_SHA ==> ${env.GIT_SHA}"
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
             println "DEBUG: env.JOB_NAME ==> ${env.JOB_NAME}"
             println "DEBUG: env.BUILD_NUMBER ==> ${env.BUILD_NUMBER}"
-            println "DEBUG: imageTag ==> " + imageTag
             println "DEBUG: buildDate ==> " + buildDate
+            println "DEBUG: imageTag ==> " + imageTag
+            println "DEBUG: apiImage ==> " + apiImage
+            println "DEBUG: webImage ==> " + webImage
 
             println "DEBUG: Start code compile stage"
             stage ('BUILD: code compile and test') {
@@ -48,17 +56,19 @@ volumes:[
                 }
             }
 
-            stage ('BUILD: containerize and publish TO ACR') {
+            stage ('BUILD: containerize and publish TO repository') {
                 container('docker') {
                     // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
                     sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackapi:${imageTag} ."
-                    sh "docker push chzbrgr71/smackapi:${imageTag}"
-                    sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} ."
-                    //sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=1.0.${env.BUILD_NUMBER} --build-arg VCS_REF=${env.GIT_SHA} -t chzbrgr71/smackweb:${imageTag} -f ./smackweb/Dockerfile ."
-                    sh "docker push chzbrgr71/smackweb:${imageTag}"
+                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t apiImage ."
+                    sh "docker push ${apiImage}"
+                    println "DEBUG: pushed image ${apiImage}"
+                    sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t webImage ."
+                    sh "docker push ${webImage}"
+                    println "DEBUG: pushed image ${webImage}"
                 }
             }
+            // use kubernetes plug-in to release or update app
         }
     }
 
