@@ -40,6 +40,7 @@ volumes:[
             println "DEBUG: env.BRANCH_NAME ==> ${env.BRANCH_NAME}"
             println "DEBUG: env.JOB_NAME ==> ${env.JOB_NAME}"
             println "DEBUG: env.BUILD_NUMBER ==> ${env.BUILD_NUMBER}"
+            println "DEBUG: appVersion ==> " + appVersion
             println "DEBUG: buildDate ==> " + buildDate
             println "DEBUG: imageTag ==> " + imageTag
             println "DEBUG: apiImage ==> " + apiImage
@@ -60,10 +61,10 @@ volumes:[
                 container('docker') {
                     // for now, push to Docker Hub. Set in "Manage Jenkins, Configure System, Environment Variables"
                     sh "docker login -u chzbrgr71 -p ${DOCKER_PWD}"
-                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t apiImage ."
+                    sh "cd smackapi && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t ${apiImage} ."
                     sh "docker push ${apiImage}"
                     println "DEBUG: pushed image ${apiImage}"
-                    sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t webImage ."
+                    sh "cd smackweb && docker build --build-arg BUILD_DATE='${buildDate}' --build-arg VERSION=${appVersion} --build-arg VCS_REF=${env.GIT_SHA} -t ${webImage} ."
                     sh "docker push ${webImage}"
                     println "DEBUG: pushed image ${webImage}"
                 }
