@@ -95,7 +95,7 @@ volumes:[
 
                 // using Azure Kubernetes Continuous Deploy Plugin 1.0
                 // https://github.com/Microsoft/kubernetes-cd-plugin
-                kubernetesDeploy configs: 'kubeconfig', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+                kubernetesDeploy configs: 'kube.yaml', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 
             }
         }
