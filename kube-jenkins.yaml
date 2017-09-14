@@ -18,7 +18,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackapi
-            image: "${apiACRImage}"
+            image: ${apiACRImage}
             ports:
             - containerPort: 8081
 
@@ -50,7 +50,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackweb
-            image: "${webACRImage}"
+            image: ${webACRImage}
             env:
             - name: API_SERVICE
               value: "smackapi.default.svc.cluster.local"
