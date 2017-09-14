@@ -24,7 +24,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	var kubePodIP = os.Getenv("KUBE_POD_IP")
 
 	// render page
-	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Homepage</h1><body style=background-color:%s><p>Git: %s</p><p>App version: %s</p><p>Image build date: %s</p><p>Kubernetes node: %s</p><p>Kubernetes pod name: %s</p><p>Kubernetes pod IP: %s</p></body></html>", backColor, gitSHA, appVersion, imageBuildDate, kubeNodeName, kubePodName, kubePodIP)
+	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Cool Homepage</h1><body style=background-color:%s><p>Git: %s</p><p>App version: %s</p><p>Image build date: %s</p><p>Kubernetes node: %s</p><p>Kubernetes pod name: %s</p><p>Kubernetes pod IP: %s</p></body></html>", backColor, gitSHA, appVersion, imageBuildDate, kubeNodeName, kubePodName, kubePodIP)
 	fmt.Fprintf(w, html)
 }
 
