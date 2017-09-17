@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"os"
 )
 
 type Config struct {
-	Key      string `json:"Key"`
-	Category string `json:"Category"`
-	Item     string `json:"Item"`
-	Value    string `json:"Value"`
+	Key          string `json:"Key"`
+	BackColor    string `json:"BackColor"`
+	AppVersion   string `json:"AppVersion"`
+	BuildDate    string `json:"BuildDate"`
+	KubeNodeName string `json:"KubeNodeName"`
+	KubePodName  string `json:"KubePodName"`
+	KubePodIP    string `json:"KubePodIP"`
 }
 
 type Configs []Config
@@ -22,13 +24,15 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "RUNNING")
 }
 
-func returnAllConfigs(w http.ResponseWriter, r *http.Request) {
-	configs := Configs{
-		Config{Key: "1", Category: "UI", Item: "Background Color", Value: "Blue"},
-		Config{Key: "2", Category: "k8s", Item: "Kubernetes Node", Value: "minkube"},
-		Config{Key: "3", Category: "k8s", Item: "Kubernetes Pod", Value: "pod-name"},
-		Config{Key: "4", Category: "k8s", Item: "Kubernetes IP", Value: "192.168.1.1"},
-	}
+func returnConfig(w http.ResponseWriter, r *http.Request) {
+	var appVersion = "1.0.0"
+	var backColor = "Blue"
+	var imageBuildDate = os.Getenv("IMAGE_BUILD_DATE")
+	var kubeNodeName = os.Getenv("KUBE_NODE_NAME")
+	var kubePodName = os.Getenv("KUBE_POD_NAME")
+	var kubePodIP = os.Getenv("KUBE_POD_IP")
+
+	configs := Config{Key: "10", BackColor: backColor, AppVersion: appVersion, BuildDate: imageBuildDate, KubeNodeName: kubeNodeName, KubePodName: kubePodName, KubePodIP: kubePodIP}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -36,25 +40,6 @@ func returnAllConfigs(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(configs); err != nil {
 		panic(err)
 	}
-}
-
-func returnColor(w http.ResponseWriter, r *http.Request) {
-	configs := Config{Key: "1", Category: "UI", Item: "Background Color", Value: "Blue"}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	if err := json.NewEncoder(w).Encode(configs); err != nil {
-		panic(err)
-	}
-}
-
-func returnSingleConfig(w http.ResponseWriter, r *http.Request) {
-	// need to implement this... return single item based on key
-	vars := mux.Vars(r)
-	key := vars["key"]
-
-	fmt.Fprintf(w, "Key: "+key)
 }
 
 func testHandler(resp http.ResponseWriter, req *http.Request) {

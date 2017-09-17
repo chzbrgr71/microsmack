@@ -37,7 +37,7 @@ func getBackColor() string {
 	var configObject Config
 	json.Unmarshal(responseData, &configObject)
 
-	value := configObject.Value
+	value := "configObject.Value"
 
 	return value
 

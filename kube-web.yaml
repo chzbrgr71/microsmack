@@ -39,7 +39,7 @@ metadata:
 spec:
   selector:
     app: smackweb
-  type: NodePort  
+  type: LoadBalancer  
   ports:
   - name: http
     port: 8080
