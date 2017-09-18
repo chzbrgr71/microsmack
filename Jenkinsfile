@@ -96,7 +96,8 @@ volumes:[
                 // using Azure Kubernetes Continuous Deploy Plugin 1.0
                 // https://github.com/Microsoft/kubernetes-cd-plugin
                 // kubernetesDeploy configs: 'kube-jenkins.yaml', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
-
+                // use envvars for plug-in to read yaml file
+                /*
                 kubernetesDeploy(
                     credentialsType: 'SSH',
                     ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'],
@@ -104,7 +105,9 @@ volumes:[
                     enableConfigSubstitution: true,
                     secretName: 'acrregistrykey',
                     dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']],
-                )
+                )*/
+
+                kubernetesDeploy configs: 'kube-jenkins.yaml', credentialsType: 'SSH', kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 
             }
         }
