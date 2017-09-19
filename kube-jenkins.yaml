@@ -20,6 +20,19 @@ items:
           containers:
           - name: smackapi
             image: briar123.azurecr.io/chzbrgr71/smackapi:latest
+            env:
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: KUBE_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KUBE_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             ports:
             - containerPort: 8081
 
