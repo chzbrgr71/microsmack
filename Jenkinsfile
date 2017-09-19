@@ -96,7 +96,8 @@ volumes:[
             stage ('DEPLOY: update application on kubernetes') {
                 println "DEBUG: deploy new containers to kubernetes stage"
                 container('kubectl') {
-                    sh "kubectl apply -f kube-jenkins.yaml"
+                    //sh "kubectl apply -f kube-jenkins.yaml"
+                    sh "kubectl get node"
                 }
             }
         }
