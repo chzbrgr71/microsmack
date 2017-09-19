@@ -4,8 +4,7 @@ import java.text.SimpleDateFormat
 podTemplate(label: 'jenkins-pipeline', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave:2.62', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins', resourceRequestCpu: '200m', resourceLimitCpu: '200m', resourceRequestMemory: '256Mi', resourceLimitMemory: '256Mi'),
     containerTemplate(name: 'golang', image: 'golang:1.7.5', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'docker', image: 'docker:17.06.0', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.4.8', command: 'cat', ttyEnabled: true)
+    containerTemplate(name: 'docker', image: 'docker:17.06.0', command: 'cat', ttyEnabled: true)
 ],
 volumes:[
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -93,13 +92,22 @@ volumes:[
             // use kubernetes plug-in to release or update app
             stage ('DEPLOY: update application on kubernetes') {
                 println "DEBUG: deploy new containers to kubernetes stage"
-                container('kubectl') {
-                    // use envvars for plug-in to read yaml file
-                    env.ENV_API_IMAGE = apiACRImage
-                    env.ENV_WEB_IMAGE = webACRImage
 
-                    sh "kubectl apply -f kube-jenkins.yaml"
-                }
+                // using Azure Kubernetes Continuous Deploy Plugin 1.0
+                // https://github.com/Microsoft/kubernetes-cd-plugin
+                // kubernetesDeploy configs: 'kube-jenkins.yaml', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+                // use envvars for plug-in to read yaml file
+                env.ENV_API_IMAGE = apiACRImage
+                env.ENV_WEB_IMAGE = webACRImage
+                
+                kubernetesDeploy(
+                    credentialsType: 'SSH',
+                    ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'],
+                    configs: 'kube-jenkins.yaml',
+                    enableConfigSubstitution: true,
+                    secretName: 'acrregistrykey',
+                    dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']],
+                )
             }
         }
     }
