@@ -80,10 +80,12 @@ volumes:[
 
                     // push images to repo (ACR)
                     def apiACRImage = acrServer + "/" + apiImage
+                    env.ENV_API_IMAGE = "${apiACRImage}"
                     sh "docker tag ${apiImage} ${apiACRImage}"
                     sh "docker push ${apiACRImage}"
                     println "DEBUG: pushed image ${apiACRImage}"
                     def webACRImage = acrServer + "/" + webImage
+                    env.ENV_WEB_IMAGE = "${webACRImage}"
                     sh "docker tag ${webImage} ${webACRImage}"
                     sh "docker push ${webACRImage}"
                     println "DEBUG: pushed image ${webACRImage}"
@@ -94,10 +96,6 @@ volumes:[
             stage ('DEPLOY: update application on kubernetes') {
                 println "DEBUG: deploy new containers to kubernetes stage"
                 container('kubectl') {
-                    // use envvars for plug-in to read yaml files
-                    env.ENV_API_IMAGE = "${apiACRImage}"
-                    env.ENV_WEB_IMAGE = "${webACRImage}"
-
                     sh "kubectl apply -f kube-jenkins.yaml"
                 }
             }
