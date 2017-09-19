@@ -7,6 +7,7 @@ items:
     kind: Deployment
     metadata:
       name: smackapi-deploy
+      namespace: default
     spec:
       replicas: 3
       template: 
@@ -18,7 +19,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackapi
-            image: ${ENV_API_IMAGE}
+            image: briar123.azurecr.io/chzbrgr71/smackapi:latest
             ports:
             - containerPort: 8081
 
@@ -26,6 +27,7 @@ items:
     kind: Service
     metadata:
       name: smackapi
+      namespace: default
     spec:
       selector:
         app: smackapi
@@ -39,6 +41,7 @@ items:
     kind: Deployment
     metadata:
       name: smackweb-deploy
+      namespace: default
     spec:
       replicas: 2
       template: 
@@ -50,7 +53,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackweb
-            image: ${ENV_WEB_IMAGE}
+            image: briar123.azurecr.io/chzbrgr71/smackweb:latest
             env:
             - name: API_SERVICE
               value: "smackapi.default.svc.cluster.local"
@@ -75,6 +78,7 @@ items:
     kind: Service
     metadata:
       name: smackweb
+      namespace: default
     spec:
       selector:
         app: smackweb

@@ -97,6 +97,8 @@ volumes:[
                 println "DEBUG: deploy new containers to kubernetes stage"
                 container('kubectl') {
                     sh "kubectl apply -f kube-jenkins.yaml"
+                    sh "kubectl set image deployment/smackapi-deploy smackapi=${apiACRImage} --namespace=default"
+                    sh "kubectl set image deployment/smackweb-deploy smackweb=${webACRImage} --namespace=default"
                 }
             }
         }
