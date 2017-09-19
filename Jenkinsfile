@@ -94,9 +94,9 @@ volumes:[
             stage ('DEPLOY: update application on kubernetes') {
                 println "DEBUG: deploy new containers to kubernetes stage"
                 container('kubectl') {
-                    // use envvars for plug-in to read yaml file
-                    env.ENV_API_IMAGE = apiACRImage
-                    env.ENV_WEB_IMAGE = webACRImage
+                    // use envvars for plug-in to read yaml files
+                    env.ENV_API_IMAGE = "${apiACRImage}"
+                    env.ENV_WEB_IMAGE = "${webACRImage}"
 
                     sh "kubectl apply -f kube-jenkins.yaml"
                 }
