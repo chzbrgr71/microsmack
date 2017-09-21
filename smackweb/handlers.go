@@ -42,6 +42,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
+		//log.Print(err)
 	}
 	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
