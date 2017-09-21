@@ -19,7 +19,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackapi
-            image: ${ENV_API_IMAGE}
+            image: briar123.azurecr.io/chzbrgr71/smackapi:latest
             env:
             - name: KUBE_NODE_NAME
               valueFrom:
@@ -66,7 +66,7 @@ items:
           - name: acrregistrykey
           containers:
           - name: smackweb
-            image: ${ENV_WEB_IMAGE}
+            image: briar123.azurecr.io/chzbrgr71/smackweb:latest
             env:
             - name: API_SERVICE
               value: "smackapi.default.svc.cluster.local"
