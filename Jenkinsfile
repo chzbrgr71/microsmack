@@ -86,6 +86,9 @@ volumes:[
                     sh "docker tag ${webImage} ${webACRImage}"
                     sh "docker push ${webACRImage}"
                     println "DEBUG: pushed image ${webACRImage}"
+
+                    env.ENV_API_IMAGE = apiACRImage
+                    env.ENV_WEB_IMAGE = webACRImage
                 }
             }
 
@@ -97,8 +100,6 @@ volumes:[
                 // https://github.com/Microsoft/kubernetes-cd-plugin
                 // kubernetesDeploy configs: 'kube-jenkins.yaml', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
                 // use envvars for plug-in to read yaml file
-                env.ENV_API_IMAGE = apiACRImage
-                env.ENV_WEB_IMAGE = webACRImage
                 
                 kubernetesDeploy(
                     credentialsType: 'SSH',
