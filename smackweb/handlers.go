@@ -60,7 +60,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	apiKubePodIP := configObject.KubePodIP
 
 	// render page
-	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Cool Homepage</h1><body style=background-color:%s><p>Git: %s<br>App version: %s<br>Image build date: %s</p><p>Kubernetes node: %s<br>Kubernetes pod name: %s<br>Kubernetes pod IP: %s</p><p>------------</p><p>Backend API (Version %s):<br>API build date: %s<br>API kubernetes node: %s<br>API kubernetes pod: %s<br>API kubernetes IP: %s</p></body></html>", backColor, gitSHA, appVersion, imageBuildDate, kubeNodeName, kubePodName, kubePodIP, apiVersion, apiBuildDate, apiKubeNodeName, apiKubePodName, apiKubePodIP)
+	html := fmt.Sprintf("<!DOCTYPE html><html><font color=white><h1>Microsmack Homepage</h1><body style=background-color:%s><p>Git: %s<br>App version: %s<br>Image build date: %s</p><p>Kubernetes node: %s<br>Kubernetes pod name: %s<br>Kubernetes pod IP: %s</p><p>------------</p><p>Backend API (Version %s):<br>API build date: %s<br>API kubernetes node: %s<br>API kubernetes pod: %s<br>API kubernetes IP: %s</p></body></html>", backColor, gitSHA, appVersion, imageBuildDate, kubeNodeName, kubePodName, kubePodIP, apiVersion, apiBuildDate, apiKubeNodeName, apiKubePodName, apiKubePodIP)
 	fmt.Fprintf(w, html)
 }
 
