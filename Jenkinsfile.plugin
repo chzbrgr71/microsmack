@@ -2,10 +2,10 @@
 import java.text.SimpleDateFormat
 
 podTemplate(label: 'jenkins-pipeline', containers: [
+    //containerTemplate(name: 'jnlp', image: 'chzbrgr71/jnlp-slave', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins', resourceRequestCpu: '200m', resourceLimitCpu: '200m', resourceRequestMemory: '256Mi', resourceLimitMemory: '256Mi'),
     containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave:2.62', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins', resourceRequestCpu: '200m', resourceLimitCpu: '200m', resourceRequestMemory: '256Mi', resourceLimitMemory: '256Mi'),
     containerTemplate(name: 'golang', image: 'golang:1.7.5', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'docker', image: 'docker:17.06.0', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.7.4', command: 'cat', ttyEnabled: true)
+    containerTemplate(name: 'docker', image: 'docker:17.06.0', command: 'cat', ttyEnabled: true)
 ],
 volumes:[
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -20,7 +20,7 @@ volumes:[
             // configuration parameters and variables for pipeline
             // def pwd = pwd()
             def repo = "chzbrgr71"
-            def appMajorVersion = "1.0"
+            def appMajorVersion = "1.1"
             def acrServer = "briar123.azurecr.io"
             def acrJenkinsCreds = "acr_creds" //this is set in Jenkins global credentials
             sh 'git rev-parse HEAD > git_commit_id.txt'
@@ -80,26 +80,36 @@ volumes:[
 
                     // push images to repo (ACR)
                     def apiACRImage = acrServer + "/" + apiImage
-                    env.ENV_API_IMAGE = "${apiACRImage}"
                     sh "docker tag ${apiImage} ${apiACRImage}"
                     sh "docker push ${apiACRImage}"
                     println "DEBUG: pushed image ${apiACRImage}"
                     def webACRImage = acrServer + "/" + webImage
-                    env.ENV_WEB_IMAGE = "${webACRImage}"
                     sh "docker tag ${webImage} ${webACRImage}"
                     sh "docker push ${webACRImage}"
                     println "DEBUG: pushed image ${webACRImage}"
+
+                    env.ENV_API_IMAGE = apiACRImage
+                    env.ENV_WEB_IMAGE = webACRImage
                 }
             }
 
             // use kubernetes plug-in to release or update app
             stage ('DEPLOY: update application on kubernetes') {
                 println "DEBUG: deploy new containers to kubernetes stage"
-                container('kubectl') {
-                    sh "kubectl apply -f kube-jenkins.yaml"
-                    sh "kubectl set image deployment/smackapi-deploy smackapi=${env.ENV_API_IMAGE} --namespace=default"
-                    sh "kubectl set image deployment/smackweb-deploy smackweb=${env.ENV_WEB_IMAGE} --namespace=default"
-                }
+
+                // using Azure Kubernetes Continuous Deploy Plugin 1.0
+                // https://github.com/Microsoft/kubernetes-cd-plugin
+                // kubernetesDeploy configs: 'kube-jenkins.yaml', credentialsType: 'SSH', dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']], kubeConfig: [path: ''], secretName: 'acrregistrykey', ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+                // use envvars for plug-in to read yaml file
+                
+                kubernetesDeploy(
+                    credentialsType: 'SSH',
+                    ssh: [sshCredentialsId: 'briar-k8s4mgmt', sshServer: 'briar-k8s4mgmt.westus.cloudapp.azure.com'],
+                    configs: 'kube-jenkins.yaml',
+                    enableConfigSubstitution: true,
+                    secretName: 'acrregistrykey',
+                    dockerCredentials: [[credentialsId: 'acr_creds', url: 'http://briar123.azurecr.io']],
+                )
             }
         }
     }
