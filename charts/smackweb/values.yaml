@@ -1,6 +1,6 @@
 # Default values for chart
 
-serviceType: NodePort
+serviceType: LoadBalancer
 servicePort: 8080
 containerPort: 8080
 component: "smackweb"
